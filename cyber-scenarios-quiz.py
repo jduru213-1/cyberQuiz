@@ -49,67 +49,40 @@ cyber_threats = {
 }
 
 # Streamlit UI
-st.title("Cybersecurity Threat Library with Interactive Scenarios")
+st.title("Cybersecurity Threat Library")
 
-st.header("Learn about common cybersecurity threats and test your responses!")
+st.sidebar.header("Select an Attack Type")
+# Add a "Select a threat" option as the default
+threat_options = ["Select a threat"] + list(cyber_threats.keys())
+threat = st.sidebar.selectbox("Choose a threat to learn more", threat_options)
 
-# Sidebar: Select a threat
-threat = st.sidebar.selectbox("Select a threat to learn more", list(cyber_threats.keys()))
+# Check if a valid threat is selected
+if threat != "Select a threat":
+    # Display threat description
+    st.subheader(f"Threat: {threat}")
+    st.write(cyber_threats[threat]["description"])
 
-# Display threat description
-st.subheader(f"Threat: {threat}")
-st.write(cyber_threats[threat]["description"])
+    # Scenario and choices
+    st.subheader("Scenario:")
+    st.write(cyber_threats[threat]["scenario"])
 
-# Scenario and choices
-st.subheader("Scenario:")
-st.write(cyber_threats[threat]["scenario"])
+    # Choices for user
+    choices = cyber_threats[threat]["choices"]
+    selected_choice = st.radio("What would you do?", choices)
 
-# Choices for user
-choices = cyber_threats[threat]["choices"]
-selected_choice = st.radio("What would you do?", choices)
+    # Check the answer
+    if st.button("Submit"):
+        # Get the correct choice index
+        correct_answer = cyber_threats[threat]["correct"]
+        explanation = cyber_threats[threat]["explanation"]
 
-# Check the answer
-if st.button("Submit"):
-    # Get the correct choice index
-    correct_answer = cyber_threats[threat]["correct"]
-    explanation = cyber_threats[threat]["explanation"]
-
-    if selected_choice == choices[correct_answer]:
-        st.success("Correct! 🎉")
-    else:
-        st.error("Incorrect. 😢")
-    
-    # Show the explanation
-    st.write(f"**Explanation:** {explanation}")
-
-# Quiz Section
-st.header("Quiz: Test Your Cybersecurity Knowledge")
-quiz_correct = 0
-
-if st.button("Start Quiz"):
-    # Iterate through all threats and ask questions
-    for q, data in cyber_threats.items():
-        st.subheader(f"Question: {q}")
-        st.write(data["scenario"])
-        selected_quiz_answer = st.radio("Select the best answer", data["choices"], key=q)
-
-        # Check answer correctness
-        if selected_quiz_answer == data["choices"][data["correct"]]:
-            st.write("Correct! ✅")
-            quiz_correct += 1
+        if selected_choice == choices[correct_answer]:
+            st.success("Correct! 🎉")
         else:
-            st.write(f"Incorrect. The correct answer is: {data['choices'][data['correct']]}")
-        
-        # Explanation
-        st.write(f"Explanation: {data['explanation']}")
-    
-    st.subheader(f"Your Total Score: {quiz_correct}/{len(cyber_threats)}")
+            st.error("Incorrect. 😢")
 
-# Conclusion / Learning Outcome
-st.header("Learning Outcomes")
-st.write("""
-By the end of this app, you should be able to:
-- Recognize the common types of cybersecurity threats.
-- Understand the best practices for responding to various types of attacks.
-- Learn how to mitigate risks and prevent attacks through secure practices.
-""")
+        # Show the explanation
+        st.write(f"**Explanation:** {explanation}")
+else:
+    # Display a message when no threat is selected
+    st.write("Please select a threat from the sidebar to learn more about it.")
